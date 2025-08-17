@@ -36,23 +36,23 @@ if [ ! -f "$KRAKEN2_DB/database${BRACKEN_READ_LEN}mers.kmer_distrib" ]; then
 fi
 
 # === QC ===
-#fastqc "$READ1" "$READ2"
+fastqc "$READ1" "$READ2"
 
-#fastp \
-#  -i "$READ1" \
-#  -I "$READ2" \
-#  -o reads_R1.clean.fastq.gz \
-#  -O reads_R2.clean.fastq.gz \
-#  --detect_adapter_for_pe \
-#  --cut_front --cut_tail --cut_mean_quality 20 \
-#  --length_required 50 \
-#  --trim_poly_g \
-#  --thread "$THREADS" \
-#  --html fastp_report.html \
-#  --json fastp_report.json
+fastp \
+  -i "$READ1" \
+  -I "$READ2" \
+  -o reads_R1.clean.fastq.gz \
+  -O reads_R2.clean.fastq.gz \
+  --detect_adapter_for_pe \
+  --cut_front --cut_tail --cut_mean_quality 20 \
+  --length_required 50 \
+  --trim_poly_g \
+  --thread "$THREADS" \
+  --html fastp_report.html \
+  --json fastp_report.json
 
-#fastqc reads_R1.clean.fastq.gz reads_R2.clean.fastq.gz
-#multiqc .
+fastqc reads_R1.clean.fastq.gz reads_R2.clean.fastq.gz
+multiqc .
 
 # === Host removal ===
 kneaddata \
