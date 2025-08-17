@@ -30,7 +30,17 @@ The pipeline integrates commonly used tools for **quality control, host read rem
    - [`Krona`](https://github.com/marbl/Krona)
 
 ---
+**Outputs:**
 
+QC reports (fastp_report.html, multiqc_report.html)
+
+Host-filtered FASTQ files
+
+Taxonomy classification (sample.kraken2.report, sample.bracken.species)
+
+Abundance tables (merged_abundance.tsv)
+
+Statistical results (alpha_diversity.tsv, beta_diversity.pdf, differential_abundance.tsv)
 ---
 
 ## ⚙️ Installation
@@ -42,16 +52,4 @@ Example (Kraken2 + Bracken environment):
 conda create -n kraken2_env -c bioconda -c conda-forge kraken2 bracken
 conda activate kraken2_env
 
-
-## **Outputs:**
-
-QC reports (fastp_report.html, multiqc_report.html)
-
-Host-filtered FASTQ files
-
-Taxonomy classification (sample.kraken2.report, sample.bracken.species)
-
-Abundance tables (merged_abundance.tsv)
-
-Statistical results (alpha_diversity.tsv, beta_diversity.pdf, differential_abundance.tsv)
 
