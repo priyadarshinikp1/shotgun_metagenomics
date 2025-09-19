@@ -129,5 +129,3 @@ The `notebooks/` folder contains a **Jupyter notebook** with:
 * All logs are timestamped and written to the pipeline runtime log files.
 
 ---
-
-👉 Do you want me to also include a **flow diagram** of the full workflow (FASTQ → QC → Taxonomy → HUMAnN3 → Notebook) in this README? It would give new users a quick high-level picture.
