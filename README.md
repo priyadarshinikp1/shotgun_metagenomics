@@ -32,7 +32,7 @@ This repository contains a **comprehensive pipeline for shotgun metagenomic anal
 1. **Clone this repository**
 
    ```bash
-   git clone https://github.com/your-username/shotgun-metagenomics.git
+   git clone https://github.com/priyadarshinikp1/shotgun-metagenomics.git
    cd shotgun-metagenomics
    ```
 
