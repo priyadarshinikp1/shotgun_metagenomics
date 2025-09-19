@@ -1,3 +1,4 @@
+
 #!/bin/bash
 set -euo pipefail
 
@@ -62,7 +63,7 @@ run_step() {
 }
 
 # === Load configuration ===
-source gut/config.env
+source gut/config.env.save
 source ~/miniconda3/etc/profile.d/conda.sh
 #conda activate
 
@@ -89,8 +90,12 @@ fi
 
 # === Quality Control (QC) ===
 run_step "FastQC raw reads" "$OUTPUT_DIR/fastqc_raw.done" \
-    "$OUTPUT_DIR/${OUTPUT_PREFIX}_R1_fastqc.html $OUTPUT_DIR/${OUTPUT_PREFIX}_R2_fastqc.html" \
-    fastqc -o "$OUTPUT_DIR" $READ1 $READ2
+    "$OUTPUT_DIR/$(basename $READ1 .fastq.gz)_fastqc.html \
+     $OUTPUT_DIR/$(basename $READ2 .fastq.gz)_fastqc.html \
+     $OUTPUT_DIR/$(basename $READ1 .fastq.gz)_fastqc.zip \
+     $OUTPUT_DIR/$(basename $READ2 .fastq.gz)_fastqc.zip" \
+    fastqc -o "$OUTPUT_DIR" --threads "$THREADS" $READ1 $READ2
+
 
 run_step "Read trimming with fastp" "$OUTPUT_DIR/fastp.done" \
     "$OUTPUT_DIR/${OUTPUT_PREFIX}_R1.clean.fastq.gz $OUTPUT_DIR/${OUTPUT_PREFIX}_R2.clean.fastq.gz" \
@@ -115,11 +120,13 @@ run_step "FastQC cleaned reads" "$OUTPUT_DIR/fastqc_clean.done" \
 
 run_step "MultiQC report" "$OUTPUT_DIR/multiqc.done" \
     "$OUTPUT_DIR/${OUTPUT_PREFIX}_multiqc_report.html" \
-    multiqc "$OUTPUT_DIR" -o "$OUTPUT_DIR"
+    multiqc "$OUTPUT_DIR" -o "$OUTPUT_DIR" -n "${OUTPUT_PREFIX}_multiqc_report.html" --force
 
-# === Host read removal ===
+mkdir -p "$OUTPUT_DIR/kneaddata_cleaned"
+
+# === Host read removal (paired only) ===
 run_step "Kneaddata host removal" "$OUTPUT_DIR/kneaddata.done" \
-    "$OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_1.fastq.gz $OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_2.fastq.gz" \
+    "$OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_1.fastq $OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_2.fastq" \
     kneaddata \
     -i1 "$OUTPUT_DIR/${OUTPUT_PREFIX}_R1.clean.fastq.gz" \
     -i2 "$OUTPUT_DIR/${OUTPUT_PREFIX}_R2.clean.fastq.gz" \
@@ -128,14 +135,15 @@ run_step "Kneaddata host removal" "$OUTPUT_DIR/kneaddata.done" \
     -t "$THREADS" \
     --output-prefix "${OUTPUT_PREFIX}_cleaned"
 
+
 # === Taxonomic classification ===
 run_step "Taxonomic classification" "$OUTPUT_DIR/kraken2.done" \
     "$OUTPUT_DIR/${OUTPUT_PREFIX}.kraken2.out $OUTPUT_DIR/${OUTPUT_PREFIX}.kraken2.report" \
     kraken2 \
     --db "$KRAKEN2_DB" \
     --threads "$THREADS" \
-    --paired "$OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_1.fastq.gz" \
-            "$OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_2.fastq.gz" \
+    --paired "$OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_1.fastq" \
+            "$OUTPUT_DIR/kneaddata_cleaned/${OUTPUT_PREFIX}_cleaned_paired_2.fastq" \
     --report "$OUTPUT_DIR/${OUTPUT_PREFIX}.kraken2.report" \
     --output "$OUTPUT_DIR/${OUTPUT_PREFIX}.kraken2.out"
 
