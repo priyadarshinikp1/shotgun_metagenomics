@@ -1,55 +1,133 @@
-# Shotgun Metagenomics Pipeline
+---
 
-This repository contains a reproducible workflow for **shotgun metagenomic data analysis**, from raw sequencing reads to statistical analysis and visualization.  
+# Shotgun Metagenomics Analysis Pipeline
 
-The pipeline integrates commonly used tools for **quality control, host read removal, taxonomic classification, abundance estimation, and downstream analysis**.
+This repository contains a **comprehensive pipeline for shotgun metagenomic analysis**, including quality control, taxonomic classification, functional profiling.
 
 ---
 
-## Workflow Overview
-1. **Quality Control**  
-   - [`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)  
-   - [`fastp`](https://github.com/OpenGene/fastp)  
-   - [`MultiQC`](https://multiqc.info/)
+## Features
 
-2. **Removal of Host Contamination**  
-   - [`kneaddata`](https://huttenhower.sph.harvard.edu/kneaddata/) OR  
-   - [`bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/) + [`samtools`](http://www.htslib.org/)
+* **Environment management**
 
-3. **Taxonomic Classification**  
-   - [`Kraken2`](https://ccb.jhu.edu/software/kraken2/)  
-   - [`Bracken`](https://ccb.jhu.edu/software/bracken/)
+  * Reproducible installation via `environment.yml`
 
-4. **Abundance Estimation**  
-   - Merge Bracken reports across samples into a single abundance table
+* **Pipelines**
 
-5. **Statistical Analysis & Visualization**  
-   - [`phyloseq`](https://joey711.github.io/phyloseq/)  
-   - [`vegan`](https://cran.r-project.org/web/packages/vegan/index.html)  
-   - [`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)  
-   - [`Krona`](https://github.com/marbl/Krona)
+  * **QC + Taxonomy pipeline**
+
+    * FastQC, fastp, KneadData, Kraken2, Bracken, Krona
+  * **Functional profiling pipeline**
+
+    * HUMAnN3 (ChocoPhlAn + UniRef databases), table joining, normalization
+
+* **Analysis notebook**
+
+  * Jupyter notebook with step-by-step explanation, visualizations
 
 ---
+
+## Setup
+
+1. **Clone this repository**
+
+   ```bash
+   git clone https://github.com/your-username/shotgun-metagenomics.git
+   cd shotgun-metagenomics
+   ```
+
+2. **Create the environment**
+
+   ```bash
+   conda env create -f metagenomics_env.yml
+   conda activate metagenomics_env
+   ```
+
+3. **Configure paths and parameters**
+   Edit the configuration file(s):
+
+   * `gut/config.env.save` → for QC + taxonomy pipeline
+   * `gut/h3_config.env` → for HUMAnN3 functional profiling
+
+---
+
+## Pipelines
+
+### 1. QC + Taxonomy (Kraken2/Bracken/Krona)
+
+```bash
+bash run_taxonomy_pipeline.sh
+```
+
+Resume mode (skips completed steps):
+
+```bash
+bash run_taxonomy_pipeline.sh --resume
+```
+
 **Outputs:**
 
-QC reports (fastp_report.html, multiqc_report.html)
+* Cleaned reads (FastQC + fastp + KneadData)
+* Kraken2 classification reports
+* Bracken species abundances
+* Krona interactive plots
 
-Host-filtered FASTQ files
-
-Taxonomy classification (sample.kraken2.report, sample.bracken.species)
-
-Abundance tables (merged_abundance.tsv)
-
-Statistical results (alpha_diversity.tsv, beta_diversity.pdf, differential_abundance.tsv)
 ---
 
-## ⚙️ Installation
+### 2. Functional Profiling (HUMAnN3)
 
-It is recommended to use **conda** environments for tool management.
-
-Example (Kraken2 + Bracken environment):
 ```bash
-conda create -n kraken2_env -c bioconda -c conda-forge kraken2 bracken
-conda activate kraken2_env
+bash functional.sh
+```
 
+Resume mode:
 
+```bash
+bash functional.sh --resume
+```
+
+**Outputs:**
+
+* Per-sample gene family and pathway abundances
+* Joined and normalized tables:
+
+  * `genefamilies.tsv`, `genefamilies_cpm.tsv`
+  * `pathabundance.tsv`, `pathabundance_relab.tsv`
+
+---
+
+## Jupyter Notebook
+
+The `notebooks/` folder contains a **Jupyter notebook** with:
+
+* Overview of the shotgun metagenomics workflow
+* Code to load and visualize Kraken2/Bracken/HUMAnN3 outputs
+
+---
+
+## Input / Output Overview
+
+* **Inputs:**
+
+  * Raw paired-end FASTQ files (`*_R1.fastq.gz`, `*_R2.fastq.gz`)
+  * Reference databases (downloaded automatically if missing)
+
+* **Outputs:**
+
+  * QC reports (FastQC, fastp, MultiQC)
+  * Host-filtered reads (KneadData)
+  * Taxonomic profiles (Kraken2, Bracken, Krona)
+  * Functional profiles (HUMAnN3 tables)
+  * Figures and summaries (from Jupyter notebooks)
+
+---
+
+## Notes
+
+* Ensure enough disk space for large databases (Kraken2, HUMAnN3).
+* Use `--resume` to skip previously completed steps.
+* All logs are timestamped and written to the pipeline runtime log files.
+
+---
+
+👉 Do you want me to also include a **flow diagram** of the full workflow (FASTQ → QC → Taxonomy → HUMAnN3 → Notebook) in this README? It would give new users a quick high-level picture.
