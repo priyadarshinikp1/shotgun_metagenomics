@@ -113,5 +113,3 @@ pipeline_runtime.log
 * Adjust `$THREADS` in your config for better performance.
 
 ---
-
-Do you want me to also **add an example workflow diagram** (like a flowchart figure) to this README so new users can quickly visualize the pipeline?
