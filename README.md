@@ -5,6 +5,9 @@
 This repository contains a **comprehensive pipeline for shotgun metagenomic analysis**, including quality control, taxonomic classification, functional profiling.
 
 ---
+**Sample used: SRR17531759**
+
+---
 
 ## Features
 
